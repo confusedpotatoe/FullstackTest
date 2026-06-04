@@ -1,4 +1,4 @@
-﻿namespace FullstackTest.Domain.Entites
+﻿namespace FullstackTest.Domain.Entities
 {
 	public class Category
 	{
