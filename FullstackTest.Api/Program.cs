@@ -1,6 +1,7 @@
 using FullstackTest.Application.Interfaces;
 using FullstackTest.Application.Services;
 using FullstackTest.Infrastructure;
+using FullstackTest.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace FullstackTest.Api
