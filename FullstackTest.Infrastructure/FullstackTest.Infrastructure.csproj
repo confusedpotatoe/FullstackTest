@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FullstackTest.Application\FullstackTest.Application.csproj" />
     <ProjectReference Include="..\FullstackTest.Domain\FullstackTest.Domain.csproj" />
   </ItemGroup>
 
