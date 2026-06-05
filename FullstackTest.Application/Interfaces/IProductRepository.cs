@@ -4,6 +4,7 @@ namespace FullstackTest.Application.Interfaces
 {
 	public interface IProductRepository : IGenericRepository<Product>
 	{
+		Task DeleteAsync(int id);
 		Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId);
 		Task<IEnumerable<Product>> GetProductsByIdAsync(IEnumerable<int> productIds);
 		Task<IEnumerable<Product>> GetProductsByNameAsync(string name);
