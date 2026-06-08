@@ -4,4 +4,5 @@
   <Project Path="FullstackTest.Application/FullstackTest.Application.csproj" />
   <Project Path="FullstackTest.Domain/FullstackTest.Domain.csproj" />
   <Project Path="FullstackTest.Infrastructure/FullstackTest.Infrastructure.csproj" />
+  <Project Path="FullstackTest.Tests/FullstackTest.Tests.csproj" Id="42333505-dfc6-49e7-b232-6913d6b303f3" />
 </Solution>
