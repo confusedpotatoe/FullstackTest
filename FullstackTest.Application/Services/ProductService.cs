@@ -43,6 +43,18 @@ namespace FullstackTest.Application.Services
 			};
 		}
 
+		public async Task<IEnumerable<ProductDto>> GetProductsByCategoryIdAsync(int categoryId)
+		{
+			var products = await _productRepository.GetProductsByCategoryIdAsync(categoryId);
+			return products.Select(p => new ProductDto
+			{
+				Id = p.Id,
+				Name = p.Name,
+				Price = p.Price,
+				CategoryId = p.CategoryId
+			});
+		}
+
 		// Krav: Formulär för att skapa ny data (Create) [4]
 		public async Task CreateProductAsync(CreateProductDto productDto)
 		{
