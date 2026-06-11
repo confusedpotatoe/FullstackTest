@@ -1,6 +1,6 @@
-using Fullstack.Frontend.Components;
+using FullstackTest.Frontend.Components;
 
-namespace Fullstack.Frontend
+namespace FullstackTest.Frontend
 {
 	public class Program
 	{
