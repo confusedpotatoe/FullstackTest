@@ -1,0 +1,85 @@
+﻿@page "/products"
+@using FullstackTest.Application.DTOs
+@inject IProductService ProductService
+@inject NavigationManager NavManager
+
+<h3>Produkthantering</h3>
+
+@if (errorMessage != null)
+{
+    @* Krav: Grundläggande felhantering (t.ex. om API:t inte svarar) *@
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (products == null && errorMessage == null)
+{
+    <p><em>Laddar produkter...</em></p>
+}
+else if (products != null)
+{
+    @* Krav: Sida för att visa data från API:t *@
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Namn</th>
+                <th>Pris</th>
+                <th>Åtgärder</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Price:-</td>
+                    <td>
+                        @* Krav: Funktion för att uppdatera och ta bort data *@
+                        <button class="btn btn-primary" @onclick="() => EditProduct(product.Id)">Redigera</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteProduct(product.Id)">Ta bort</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@* Krav: Formulär för att skapa ny data *@
+<button class="btn btn-success" @onclick="GoToCreate">Lägg till ny produkt</button>
+
+@code {
+    private IEnumerable<ProductDto>? products;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            products = await ProductService.GetAllProductsAsync();
+        }
+        catch (Exception)
+        {
+            errorMessage = "Kunde inte hämta produkter. Kontrollera att API:et är igång.";
+        }
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        try
+        {
+            await ProductService.DeleteProductAsync(id);
+            await LoadProducts(); // Ladda om listan efter borttagning
+        }
+        catch
+        {
+            errorMessage = "Det gick inte att ta bort produkten.";
+        }
+    }
+
+    private void GoToCreate() => NavManager.NavigateTo("/products/create");
+    private void EditProduct(int id) => NavManager.NavigateTo($"/products/edit/{id}");
+}

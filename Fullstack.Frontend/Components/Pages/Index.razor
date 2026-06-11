@@ -1,0 +1,44 @@
+﻿@page "/"
+
+<div class="container mt-5">
+    <div class="jumbotron text-center bg-light p-5 shadow-sm rounded">
+        <h1 class="display-4">🚀 Fullstack Product Manager</h1>
+        <p class="lead">Välkommen till din administrationspanel för produkter och kategorier.</p>
+        <hr class="my-4">
+
+        <div class="row mt-4">
+            <!-- Navigationskort för Produkter -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">📦 Produkter</h5>
+                        <p class="card-text">Hantera ditt sortiment. Här kan du se, skapa, uppdatera och ta bort produkter.</p>
+                        <a href="/products" class="btn btn-primary">Gå till Produkter</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigationskort för Kategorier -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">📁 Kategorier</h5>
+                        <p class="card-text">Organisera dina produkter genom att hantera kategorier och deras relationer.</p>
+                        <a href="/categories" class="btn btn-outline-secondary">Gå till Kategorier</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visuell checklista för projektstatus -->
+        <div class="mt-5 text-start p-4 bg-white rounded border">
+            <h5>📊 Projektstatus (Checklista för G/VG)</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">✅ <strong>Back-end:</strong> Clean Architecture & 2 Entiteter [2, 3]</li>
+                <li class="list-group-item">✅ <strong>Tester:</strong> 7+ enhetstester med NSubstitute [3]</li>
+                <li class="list-group-item">⏳ <strong>Front-end CRUD:</strong> Pågående arbete i Blazor [1]</li>
+                <li class="list-group-item">⏳ <strong>VG-Krav:</strong> GitHub Actions & Deployment [4]</li>
+            </ul>
+        </div>
+    </div>
+</div>
