@@ -39,11 +39,12 @@ namespace FullstackTest.Tests
 		{
 			// Arrange
 			var productId = 1;
-			var expectedProduct = new Product { Id = productId, Name = "BestTEST", Price = 15000 };
-			_productRepository.GetByIdAsync(productId).Returns(expectedProduct);
+			_productRepository.GetByIdAsync(productId).Returns((Product)null);
 			// Act
 			var result = await _sut.GetProductByIdAsync(productId);
+
 			// Assert
+
 			Assert.Null(result);
 		}
 
