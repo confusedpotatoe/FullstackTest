@@ -1,30 +1,23 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Fullstack.Frontend</a>
+﻿<div class="p-3 d-flex flex-column gap-2">
+    @* 1. START - Kopplad till din Index.razor *@
+    <NavLink class="btn btn-outline-dark w-100 text-start" href="" Match="NavLinkMatch.All">
+        🏠 Start
+    </NavLink>
+
+    @* 2. PRODUKTER - För CRUD-hantering *@
+    <NavLink class="btn btn-outline-dark w-100 text-start" href="products">
+        📦 Produkter
+    </NavLink>
+
+    @* 3. KATEGORIER - För CRUD-hantering *@
+    <NavLink class="btn btn-outline-dark w-100 text-start" href="categories">
+        🏷️ Kategorier
+    </NavLink>
+
+    @* 4. TESTSTATUS - Visar att dina GitHub Actions fungerar (VG-krav) *@
+    <div class="mt-4">
+        <NavLink class="btn btn-info w-100 text-start" href="test-status">
+            ✅ Teststatus (VG)
+        </NavLink>
     </div>
 </div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
-

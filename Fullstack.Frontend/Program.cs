@@ -8,6 +8,13 @@ namespace FullstackTest.Frontend
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
+			// Registrerar HttpClient så att den kan injiceras i dina Razor-komponenter
+			builder.Services.AddScoped(sp => new HttpClient
+			{
+				// Ersätt porten nedan med den port som din backend (API) körs på
+				BaseAddress = new Uri("https://localhost:7123/")
+			});
+
 			// Add services to the container.
 			builder.Services.AddRazorComponents()
 				.AddInteractiveServerComponents();

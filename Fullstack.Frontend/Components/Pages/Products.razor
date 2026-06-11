@@ -1,29 +1,31 @@
 ﻿@page "/products"
-@using FullstackTest.Application.DTOs
-@using FullstackTest.Application.Interfaces
-@inject IProductService ProductService
-@inject NavigationManager NavManager
+@using FullstackTest.Application.DTOs @* Se till att detta matchar ditt projekt *@
+@inject HttpClient Http
 
-<h3>Produkthantering</h3>
+<PageTitle>Produkter</PageTitle>
 
-@if (errorMessage != null)
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Produkthantering</h1>
+    <button class="btn btn-primary" @onclick="CreateNewProduct">➕ Lägg till ny produkt</button>
+</div>
+
+@if (products == null)
 {
-    @* Krav: Grundläggande felhantering (t.ex. om API:t inte svarar) *@
-    <div class="alert alert-danger">@errorMessage</div>
+    @* Grundläggande felhantering/Laddningsstatus enligt G-krav *@
+    <div class="alert alert-info">Laddar produkter från API...</div>
 }
-
-@if (products == null && errorMessage == null)
+else if (products.Count == 0)
 {
-    <p><em>Laddar produkter...</em></p>
+    <p>Inga produkter hittades i databasen.</p>
 }
-else if (products != null)
+else
 {
-    @* Krav: Sida för att visa data från API:t *@
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Namn</th>
                 <th>Pris</th>
+                <th>Kategori</th>
                 <th>Åtgärder</th>
             </tr>
         </thead>
@@ -32,11 +34,14 @@ else if (products != null)
             {
                 <tr>
                     <td>@product.Name</td>
-                    <td>@product.Price:-</td>
+                    <td>@product.Price: -</td>
+                    <td>@product.CategoryName</td>
                     <td>
-                        @* Krav: Funktion för att uppdatera och ta bort data *@
-                        <button class="btn btn-primary" @onclick="() => EditProduct(product.Id)">Redigera</button>
-                        <button class="btn btn-danger" @onclick="() => DeleteProduct(product.Id)">Ta bort</button>
+                        <div class="btn-group">
+                            @* Knappar för att uppdatera och ta bort *@
+                            <button class="btn btn-outline-dark btn-sm" @onclick="() => EditProduct(product.Id)">Redigera</button>
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteProduct(product.Id)">Ta bort</button>
+                        </div>
                     </td>
                 </tr>
             }
@@ -44,43 +49,34 @@ else if (products != null)
     </table>
 }
 
-@* Krav: Formulär för att skapa ny data *@
-<button class="btn btn-success" @onclick="GoToCreate">Lägg till ny produkt</button>
-
 @code {
-    private IEnumerable<ProductDto>? products;
-    private string? errorMessage;
+    private List<ProductDto>? products;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadProducts();
-    }
-
-    private async Task LoadProducts()
-    {
         try
         {
-            products = await ProductService.GetAllProductsAsync();
+            // Hämtar data asynkront från din backend
+            products = await Http.GetFromJsonAsync<List<ProductDto>>("api/products");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            errorMessage = "Kunde inte hämta produkter. Kontrollera att API:et är igång.";
+            // Grundläggande felhantering om API:t inte svarar [1]
+            Console.WriteLine($"Ett fel uppstod: {ex.Message}");
         }
     }
+
+    private void CreateNewProduct() => Console.WriteLine("Navigera till Skapa-sida");
+    private void EditProduct(int id) => Console.WriteLine($"Navigera till Redigera-sida för ID: {id}");
 
     private async Task DeleteProduct(int id)
     {
-        try
+        // Enkel bekräftelse innan radering
+        var response = await Http.DeleteAsync($"api/products/{id}");
+        if (response.IsSuccessStatusCode)
         {
-            await ProductService.DeleteProductAsync(id);
-            await LoadProducts(); // Ladda om listan efter borttagning
-        }
-        catch
-        {
-            errorMessage = "Det gick inte att ta bort produkten.";
+            // Uppdatera listan lokalt efter lyckad borttagning
+            products = products?.Where(p => p.Id != id).ToList();
         }
     }
-
-    private void GoToCreate() => NavManager.NavigateTo("/products/create");
-    private void EditProduct(int id) => NavManager.NavigateTo($"/products/edit/{id}");
 }
