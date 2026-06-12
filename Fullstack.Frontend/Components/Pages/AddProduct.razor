@@ -2,6 +2,7 @@
 @using FullstackTest.Application.DTOs
 @inject HttpClient Http
 @inject NavigationManager NavManager
+@rendermode InteractiveServer
 
 <div class="container mt-4">
     <div class="mb-3">
@@ -10,7 +11,13 @@
 
     <h2>Lägg till ny produkt</h2>
 
-    <EditForm Model="@newProduct" OnValidSubmit="HandleSubmit" class="card p-4 shadow-sm">
+    @* 2. Visa felmeddelande om API:et inte svarar (Krav för G) *@
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <EditForm Model="@newProduct" OnValidSubmit="HandleSubmit" FormName="addProductForm" class="card p-4 shadow-sm">
         <DataAnnotationsValidator />
         <ValidationSummary class="text-danger" />
 
@@ -27,7 +34,7 @@
         <div class="mb-3">
             <label class="form-label">Kategori</label>
             <InputSelect @bind-Value="newProduct.CategoryId" class="form-control">
-                <option value="">Välj en kategori...</option>
+                <option value="0">Välj en kategori...</option>
                 @if (categories != null)
                 {
                     @foreach (var cat in categories)
@@ -38,28 +45,65 @@
             </InputSelect>
         </div>
 
-        <button type="submit" class="btn btn-success">Spara produkt</button>
+        <button type="submit" class="btn btn-success" disabled="@isSubmitting">
+            @(isSubmitting ? "Sparar..." : "Spara produkt")
+        </button>
     </EditForm>
 </div>
 
 @code {
     private ProductDto newProduct = new();
     private List<CategoryDto>? categories;
+    private string? errorMessage;
+    private bool isSubmitting = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // Vi hämtar kategorier för att kunna välja en i formuläret (1-många relation)
-        categories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/categories");
+        try
+        {
+            // Hämtar kategorier för att uppfylla 1-många relationen (Krav för G)
+            categories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/categories");
+        }
+        catch (Exception)
+        {
+            errorMessage = "Kunde inte hämta kategorier. Kontrollera att API:et körs.";
+        }
     }
 
     private async Task HandleSubmit()
     {
-        // Skickar data till API:et (CRUD: Create)
-        var response = await Http.PostAsJsonAsync("api/products", newProduct);
-
-        if (response.IsSuccessStatusCode)
+        if (newProduct.CategoryId == 0)
         {
-            NavManager.NavigateTo("/products");
+            errorMessage = "Du måste välja en kategori.";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            // Skickar data till API:et (CRUD: Create)
+            var response = await Http.PostAsJsonAsync("api/products", newProduct);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavManager.NavigateTo("/products");
+            }
+            else
+            {
+                // 3. Hanterar felet om t.ex. en kategori saknar Description i databasen
+                var errorContent = await response.Content.ReadAsStringAsync();
+                errorMessage = $"Serverfel: {errorContent}";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett oväntat fel uppstod vid anslutning till API:et.";
+        }
+        finally
+        {
+            isSubmitting = false;
         }
     }
 

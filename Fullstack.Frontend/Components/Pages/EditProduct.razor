@@ -1,0 +1,130 @@
+﻿@page "/edit-product/{Id:int}"
+@using FullstackTest.Application.DTOs
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary btn-sm" @onclick="GoBack">⬅ Tillbaka till listan</button>
+    </div>
+
+    <h3>Redigera produkt</h3>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+    @if (product == null && string.IsNullOrEmpty(errorMessage))
+    {
+        <p><em>Laddar produktdata...</em></p>
+    }
+    else if (product != null)
+    {
+        <EditForm Model="@product" OnValidSubmit="HandleSubmit" FormName="editProductForm" class="card p-4 shadow-sm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label class="form-label">Produktnamn</label>
+                <InputText @bind-Value="product.Name" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Pris</label>
+                <InputNumber @bind-Value="product.Price" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Kategori</label>
+                <InputSelect @bind-Value="product.CategoryId" class="form-control">
+                    <option value="0">Välj en kategori...</option>
+                    @if (categories != null)
+                    {
+                        @foreach (var cat in categories)
+                        {
+                            <option value="@cat.Id">@cat.Name</option>
+                        }
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                    @(isSubmitting ? "Sparar ändringar..." : "Spara ändringar")
+                </button>
+                <button type="button" class="btn btn-secondary" @onclick="GoBack">Avbryt</button>
+            </div>
+        </EditForm>
+    }
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private ProductDto? product;
+    private List<CategoryDto>? categories;
+    private string? errorMessage;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Hämtar både produkten och kategorilistan (Krav för G: Visa data från API)
+            var productTask = Http.GetFromJsonAsync<ProductDto>($"api/products/{Id}");
+            var categoriesTask = Http.GetFromJsonAsync<List<CategoryDto>>("api/categories");
+
+            // Väntar på båda anropen parallellt för bättre prestanda
+            await Task.WhenAll(productTask, categoriesTask);
+
+            product = await productTask;
+            categories = await categoriesTask;
+        }
+        catch (Exception)
+        {
+            // Grundläggande felhantering om API:et inte svarar (Krav för G)
+            errorMessage = "Kunde inte hämta data från API:et. Kontrollera anslutningen.";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (product == null || product.CategoryId == 0)
+        {
+            errorMessage = "Vänligen välj en giltig kategori.";
+            return;
+        }
+
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            // Skickar en PUT-request för att uppdatera (Krav för G: CRUD - Update)
+            var response = await Http.PutAsJsonAsync($"api/products/{Id}", product);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavManager.NavigateTo("/products");
+            }
+            else
+            {
+                errorMessage = $"Servern returnerade ett fel: {response.StatusCode}";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett oväntat fel uppstod vid kommunikation med servern.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void GoBack() => NavManager.NavigateTo("/products");
+}

@@ -1,0 +1,150 @@
+﻿@page "/categories"
+@using FullstackTest.Application.DTOs
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<div class="container mt-4">
+    <h3>Hantera Kategorier</h3>
+
+    @* Grundläggande felhantering: Visar felmeddelande om API:t inte svarar (Krav för G) *@
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+    <!-- Formulär för att skapa ny kategori (Krav för G: CRUD - Create) -->
+    <div class="card p-4 shadow-sm mb-4">
+        <h5>Lägg till ny kategori</h5>
+        <EditForm Model="@newCategory" OnValidSubmit="HandleSubmit" FormName="addCategoryForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            <div class="mb-3">
+                <label class="form-label">Namn</label>
+                <InputText @bind-Value="newCategory.Name" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Beskrivning</label>
+                <InputTextArea @bind-Value="newCategory.Description" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                @(isSubmitting ? "Sparar..." : "Spara kategori")
+            </button>
+        </EditForm>
+    </div>
+
+    <!-- Lista för att visa data (Krav för G: CRUD - Read) -->
+    @if (categories == null)
+    {
+        <p><em>Laddar kategorier...</em></p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Namn</th>
+                    <th>Beskrivning</th>
+                    <th>Åtgärder</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in categories)
+                {
+                    <tr>
+                        <td>@cat.Name</td>
+                        <td>@cat.Description</td>
+                        <td>
+                            @* Knapp för att radera kategorin (Krav för G: CRUD - Delete) *@
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteCategory(cat.Id)">
+                                Ta bort
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<CategoryDto>? categories;
+    private CategoryDto newCategory = new();
+    private bool isSubmitting = false;
+    private string? errorMessage; // Variabel för att visa fel (Krav för G)
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategories();
+    }
+
+    private async Task LoadCategories()
+    {
+        errorMessage = null;
+        try
+        {
+            categories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/categories");
+        }
+        catch (Exception)
+        {
+            errorMessage = "Kunde inte hämta kategorier. Kontrollera att API:et körs.";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/categories", newCategory);
+            if (response.IsSuccessStatusCode)
+            {
+                newCategory = new();
+                await LoadCategories();
+            }
+            else
+            {
+                errorMessage = "Gick inte att spara kategorin. Kontrollera inmatningen.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett fel uppstod vid kommunikation med servern.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    // Denna metod saknades tidigare och löser det röda felet
+    private async Task DeleteCategory(int id)
+    {
+        errorMessage = null;
+        try
+        {
+            // Utför Delete-anropet (Krav för G: CRUD) [1, 2]
+            var response = await Http.DeleteAsync($"api/categories/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Uppdaterar listan lokalt för snabb feedback
+                categories = categories?.Where(c => c.Id != id).ToList();
+            }
+            else
+            {
+                errorMessage = "Kunde inte ta bort kategorin. Den kan vara kopplad till produkter.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett fel uppstod vid försök att radera kategorin.";
+        }
+    }
+}

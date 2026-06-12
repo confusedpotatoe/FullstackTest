@@ -13,15 +13,24 @@
     </button>
 </div>
 
-@if (products == null)
+@* Grundläggande felhantering: Visar felmeddelande om API:et inte svarar (Krav för G) *@
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+        <button class="btn btn-link p-0 ms-2" @onclick="LoadProducts">Försök igen</button>
+    </div>
+}
+
+@if (products == null && string.IsNullOrEmpty(errorMessage))
 {
     <div class="alert alert-info">Laddar produkter från API...</div>
 }
-else if (products.Count == 0)
+else if (products?.Count == 0)
 {
     <p>Inga produkter hittades i databasen.</p>
 }
-else
+else if (products != null)
 {
     <table class="table table-striped">
         <thead>
@@ -37,10 +46,11 @@ else
             {
                 <tr>
                     <td>@product.Name</td>
-                    <td>@product.Price: -</td>
+                    <td>@product.Price.ToString("C")</td>
                     <td>@product.CategoryName</td>
                     <td>
                         <div class="btn-group">
+                            @* Kopplar till din nyskapade redigeringssida *@
                             <button class="btn btn-outline-dark btn-sm" @onclick="() => EditProduct(product.Id)">Redigera</button>
                             <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteProduct(product.Id)">Ta bort</button>
                         </div>
@@ -53,31 +63,50 @@ else
 
 @code {
     private List<ProductDto>? products;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        errorMessage = null;
         try
         {
-
+            // Sida för att visa data från API:t (Krav för G)
             products = await Http.GetFromJsonAsync<List<ProductDto>>("api/products");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Ett fel uppstod: {ex.Message}");
+            // Fångar fel om t.ex. backend är nere (Krav för G)
+            errorMessage = "Kunde inte hämta produkter. Kontrollera att API-servern körs.";
         }
     }
 
-    private void CreateNewProduct() => Console.WriteLine("Navigera till Skapa-sida");
-    private void EditProduct(int id) => Console.WriteLine($"Navigera till Redigera-sida för ID: {id}");
+    // Funktion för att uppdatera data (Krav för G: Navigerar till din Edit-sida)
+    private void EditProduct(int id) => NavManager.NavigateTo($"/edit-product/{id}");
 
+    // Funktion för att ta bort data (Krav för G)
     private async Task DeleteProduct(int id)
     {
-        // Enkel bekräftelse innan radering
-        var response = await Http.DeleteAsync($"api/products/{id}");
-        if (response.IsSuccessStatusCode)
+        try
         {
-            // Uppdatera listan lokalt efter lyckad borttagning
-            products = products?.Where(p => p.Id != id).ToList();
+            var response = await Http.DeleteAsync($"api/products/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                // Uppdaterar listan lokalt för omedelbar respons i UI:t
+                products = products?.Where(p => p.Id != id).ToList();
+            }
+            else
+            {
+                errorMessage = "Gick inte att ta bort produkten. Servern svarade med ett fel.";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "Ett fel uppstod vid försök att ta bort produkten.";
         }
     }
 }

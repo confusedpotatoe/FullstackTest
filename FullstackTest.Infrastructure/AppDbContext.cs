@@ -16,6 +16,12 @@ namespace FullstackTest.Infrastructure
 		{
 			base.OnModelCreating(modelBuilder);
 
+			// Seedning av kategorier
+			modelBuilder.Entity<Category>().HasData(
+				new Category { Id = 1, Name = "Elektronik", Description = "Prylar och teknik" },
+				new Category { Id = 2, Name = "Hem & Inredning", Description = "Saker för hemmet" }
+			);
+
 			// Konfigurera precision för decimal-egenskapen Price
 			modelBuilder.Entity<Product>()
 				.Property(p => p.Price)
