@@ -17,6 +17,19 @@ namespace FullstackTest.Api
 			builder.Services.AddDbContext<AppDbContext>(options =>
 				options.UseSqlServer(connectionString));
 
+			// Detta tillåter din frontend att hämta data från API:et
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowAll", policy =>
+				{
+					policy.AllowAnyOrigin()
+						  .AllowAnyMethod()
+						  .AllowAnyHeader();
+				});
+			});
+
+
+			// Dependency Injection
 			builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 			builder.Services.AddScoped<IProductRepository, ProductRepository>();
 			builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -26,7 +39,6 @@ namespace FullstackTest.Api
 
 			builder.Services.AddControllers();
 
-			// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
@@ -39,11 +51,12 @@ namespace FullstackTest.Api
 				app.UseSwaggerUI();
 			}
 
+			app.UseCors("AllowAll");
+
 
 			app.UseHttpsRedirection();
 
 			app.UseAuthorization();
-
 
 			app.MapControllers();
 

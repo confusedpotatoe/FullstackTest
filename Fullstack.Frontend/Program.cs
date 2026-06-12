@@ -12,7 +12,7 @@ namespace FullstackTest.Frontend
 			builder.Services.AddScoped(sp => new HttpClient
 			{
 				// Ersätt porten nedan med den port som din backend (API) körs på
-				BaseAddress = new Uri("https://localhost:7123/")
+				BaseAddress = new Uri("https://localhost:7201/")
 			});
 
 			// Add services to the container.

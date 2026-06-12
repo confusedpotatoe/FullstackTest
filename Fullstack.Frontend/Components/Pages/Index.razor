@@ -1,33 +1,53 @@
 ﻿@page "/"
 
-<div class="container mt-5">
-    <div class="jumbotron text-center bg-light p-5 shadow-sm rounded">
-        <h1 class="display-4">🚀 Fullstack Product Manager</h1>
-        <p class="lead">Välkommen till din administrationspanel för produkter och kategorier.</p>
-        <hr class="my-4">
+<div class="text-center mb-5">
+    <h1 class="display-4">Fullstack Manager</h1>
+    <p class="lead">Välj en modul för att börja hantera ditt system.</p>
+</div>
 
-        <div class="row mt-4">
-            <!-- Navigationskort för Produkter -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">📦 Produkter</h5>
-                        <p class="card-text">Hantera ditt sortiment. Här kan du se, skapa, uppdatera och ta bort produkter.</p>
-                        <a href="/products" class="btn btn-primary">Gå till Produkter</a>
-                    </div>
+<div class="row g-4">
+    @* Box 1: Produkter (G-krav) *@
+    <div class="col-md-4">
+        <a href="products" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-primary hover-shadow">
+                <div class="card-body text-center p-5">
+                    <div class="display-1 mb-3 text-primary">📦</div>
+                    <h2 class="card-title h4 text-dark">Produkter</h2>
+                    <p class="card-text text-muted">Hantera lager, priser och detaljer.</p>
                 </div>
             </div>
+        </a>
+    </div>
 
-            <!-- Navigationskort för Kategorier -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">📁 Kategorier</h5>
-                        <p class="card-text">Organisera dina produkter genom att hantera kategorier och deras relationer.</p>
-                        <a href="/categories" class="btn btn-outline-secondary">Gå till Kategorier</a>
-                    </div>
+    @* Box 2: Kategorier (G-krav) *@
+    <div class="col-md-4">
+        <a href="categories" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-success hover-shadow">
+                <div class="card-body text-center p-5">
+                    <div class="display-1 mb-3 text-success">🏷️</div>
+                    <h2 class="card-title h4 text-dark">Kategorier</h2>
+                    <p class="card-text text-muted">Organisera produkter i grupper.</p>
                 </div>
             </div>
-        </div>
+        </a>
+    </div>
+
+    @* Box 3: Teststatus (VG-krav) *@
+    <div class="col-md-4">
+        <a href="test-status" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-info hover-shadow">
+                <div class="card-body text-center p-5">
+                    <div class="display-1 mb-3 text-info">✅</div>
+                    <h2 class="card-title h4 text-dark">Teststatus</h2>
+                    <p class="card-text text-muted">Visa resultat från GitHub Actions.</p>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
+
+<style>
+    .hover-shadow { transition: transform 0.2s, box-shadow 0.2s; }
+    .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+</style>
+Varför detta fungerar för din inlämning:

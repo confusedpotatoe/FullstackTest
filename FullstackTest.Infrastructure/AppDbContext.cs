@@ -15,6 +15,13 @@ namespace FullstackTest.Infrastructure
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			// Konfigurera precision för decimal-egenskapen Price
+			modelBuilder.Entity<Product>()
+				.Property(p => p.Price)
+				.HasColumnType("decimal(18,2)"); // 18 siffror totalt, 2 efter decimalen
+
+			// Din befintliga relationskonfiguration
 			modelBuilder.Entity<Product>()
 				.HasOne(p => p.Category)
 				.WithMany(c => c.Products)

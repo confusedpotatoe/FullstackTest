@@ -1,0 +1,67 @@
+﻿@page "/add-product"
+@using FullstackTest.Application.DTOs
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary btn-sm" @onclick="GoBack">⬅ Tillbaka till listan</button>
+    </div>
+
+    <h2>Lägg till ny produkt</h2>
+
+    <EditForm Model="@newProduct" OnValidSubmit="HandleSubmit" class="card p-4 shadow-sm">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="mb-3">
+            <label class="form-label">Produktnamn</label>
+            <InputText @bind-Value="newProduct.Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Pris</label>
+            <InputNumber @bind-Value="newProduct.Price" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Kategori</label>
+            <InputSelect @bind-Value="newProduct.CategoryId" class="form-control">
+                <option value="">Välj en kategori...</option>
+                @if (categories != null)
+                {
+                    @foreach (var cat in categories)
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-success">Spara produkt</button>
+    </EditForm>
+</div>
+
+@code {
+    private ProductDto newProduct = new();
+    private List<CategoryDto>? categories;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Vi hämtar kategorier för att kunna välja en i formuläret (1-många relation)
+        categories = await Http.GetFromJsonAsync<List<CategoryDto>>("api/categories");
+    }
+
+    private async Task HandleSubmit()
+    {
+        // Skickar data till API:et (CRUD: Create)
+        var response = await Http.PostAsJsonAsync("api/products", newProduct);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavManager.NavigateTo("/products");
+        }
+    }
+
+    private void GoBack() => NavManager.NavigateTo("/products");
+}

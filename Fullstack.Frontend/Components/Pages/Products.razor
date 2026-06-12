@@ -1,17 +1,20 @@
 ﻿@page "/products"
-@using FullstackTest.Application.DTOs @* Se till att detta matchar ditt projekt *@
+@using FullstackTest.Application.DTOs
 @inject HttpClient Http
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
 
 <PageTitle>Produkter</PageTitle>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Produkthantering</h1>
-    <button class="btn btn-primary" @onclick="CreateNewProduct">➕ Lägg till ny produkt</button>
+    <button class="btn btn-primary" @onclick='() => NavManager.NavigateTo("/add-product")'>
+        ➕ Lägg till ny produkt
+    </button>
 </div>
 
 @if (products == null)
 {
-    @* Grundläggande felhantering/Laddningsstatus enligt G-krav *@
     <div class="alert alert-info">Laddar produkter från API...</div>
 }
 else if (products.Count == 0)
@@ -38,7 +41,6 @@ else
                     <td>@product.CategoryName</td>
                     <td>
                         <div class="btn-group">
-                            @* Knappar för att uppdatera och ta bort *@
                             <button class="btn btn-outline-dark btn-sm" @onclick="() => EditProduct(product.Id)">Redigera</button>
                             <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteProduct(product.Id)">Ta bort</button>
                         </div>
@@ -56,12 +58,11 @@ else
     {
         try
         {
-            // Hämtar data asynkront från din backend
+
             products = await Http.GetFromJsonAsync<List<ProductDto>>("api/products");
         }
         catch (Exception ex)
         {
-            // Grundläggande felhantering om API:t inte svarar [1]
             Console.WriteLine($"Ett fel uppstod: {ex.Message}");
         }
     }

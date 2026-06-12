@@ -1,23 +1,5 @@
-﻿<div class="p-3 d-flex flex-column gap-2">
-    @* 1. START - Kopplad till din Index.razor *@
-    <NavLink class="btn btn-outline-dark w-100 text-start" href="" Match="NavLinkMatch.All">
-        🏠 Start
+﻿<div class="d-flex justify-content-start mb-4">
+    <NavLink class="btn btn-dark" href="" Match="NavLinkMatch.All">
+        🏠 BackToSTart
     </NavLink>
-
-    @* 2. PRODUKTER - För CRUD-hantering *@
-    <NavLink class="btn btn-outline-dark w-100 text-start" href="products">
-        📦 Produkter
-    </NavLink>
-
-    @* 3. KATEGORIER - För CRUD-hantering *@
-    <NavLink class="btn btn-outline-dark w-100 text-start" href="categories">
-        🏷️ Kategorier
-    </NavLink>
-
-    @* 4. TESTSTATUS - Visar att dina GitHub Actions fungerar (VG-krav) *@
-    <div class="mt-4">
-        <NavLink class="btn btn-info w-100 text-start" href="test-status">
-            ✅ Teststatus (VG)
-        </NavLink>
-    </div>
 </div>
